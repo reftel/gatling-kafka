@@ -39,7 +39,7 @@ class KafkaRequestAction[K,V]( val producer: KafkaProducer[K,V],
 
       outcome.onFailure(
         errorMessage =>
-          statsEngine.reportUnbuildableRequest(session.scenario, session.groups, requestName, errorMessage)
+          statsEngine.logRequestCrash(session.scenario, session.groups, requestName, errorMessage)
       )
 
       outcome

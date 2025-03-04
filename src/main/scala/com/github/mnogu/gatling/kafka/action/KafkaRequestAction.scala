@@ -8,6 +8,7 @@ import io.gatling.core.session._
 import io.gatling.commons.util.DefaultClock
 import io.gatling.commons.validation.Validation
 import io.gatling.core.CoreComponents
+import io.gatling.core.controller.throttle.Throttler
 import io.gatling.core.util.NameGen
 import io.gatling.core.stats.message.ResponseTimings
 import org.apache.kafka.clients.producer._
@@ -82,7 +83,10 @@ class KafkaRequestAction[K,V]( val producer: KafkaProducer[K,V],
           )
 
           if (throttled) {
-            coreComponents.throttler.map(_.throttle(session.scenario, () => next ! session))
+            coreComponents.throttler.map(_ ! Throttler.Command.ThrottledRequest(
+              session.scenario,
+              () => next ! session
+            ))
           } else {
             next ! session
           }
